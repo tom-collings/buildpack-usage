@@ -1,0 +1,6 @@
+package: github.com/ecsteam/buildpack-usage
+import:
+- package: github.com/cloudfoundry/cli
+  subpackages:
+  - plugin
+- package: github.com/krujos/cfcurl
