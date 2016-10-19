@@ -6,15 +6,23 @@ import (
 	"io"
 	"os"
 
+	"github.com/cloudfoundry/cli/cf/i18n"
+	"github.com/cloudfoundry/cli/cf/terminal"
+	"github.com/cloudfoundry/cli/cf/trace"
 	"github.com/cloudfoundry/cli/plugin"
+
+	"github.com/bradfitz/slice"
 	"github.com/krujos/cfcurl"
-	"github.com/olekukonko/tablewriter"
-	"github.com/xchapter7x/lo"
 )
 
 type orgSpaceInfo struct {
 	OrgName   string
 	SpaceName string
+}
+
+type appLocator struct {
+	orgSpaceInfo
+	Name string
 }
 
 // BuildpackUsage - the main struct to implement the plugin struct
@@ -25,6 +33,14 @@ type BuildpackUsage struct {
 
 // New - returns a new instance of the command
 func New() *BuildpackUsage {
+	i18n.T = func(translationID string, args ...interface{}) string {
+		if len(args) == 0 {
+			return fmt.Sprintf("%s\n", translationID)
+		}
+
+		return fmt.Sprintf(translationID+"\n", args...)
+	}
+
 	return &BuildpackUsage{
 		Input:  os.Stdin,
 		Output: os.Stdout,
@@ -38,7 +54,7 @@ func (cmd *BuildpackUsage) GetMetadata() plugin.PluginMetadata {
 		Version: plugin.VersionType{
 			Major: 0,
 			Minor: 9,
-			Build: 0,
+			Build: 9,
 		},
 		Commands: []plugin.Command{
 			{
@@ -54,6 +70,13 @@ func (cmd *BuildpackUsage) GetMetadata() plugin.PluginMetadata {
 
 // Run - do the needful
 func (cmd *BuildpackUsage) Run(cli plugin.CliConnection, args []string) {
+	defer func() {
+		// recover from panic if one occured. Set err to nil otherwise.
+		if recover() != nil {
+			os.Exit(1)
+		}
+	}()
+
 	var buildpackGUID string
 	var buildpackName string
 	var err error
@@ -67,34 +90,70 @@ func (cmd *BuildpackUsage) Run(cli plugin.CliConnection, args []string) {
 	flagSet.StringVar(&buildpackName, "b", "NOT_SET", "The requested buildpack")
 	flagSet.Parse(args[1:])
 
+	ui := terminal.NewUI(
+		os.Stdin,
+		Writer,
+		terminal.NewTeePrinter(Writer),
+		trace.NewLogger(Writer, false, "false", ""),
+	)
+
 	if buildpackName == "NOT_SET" {
-		buildpackGUID, buildpackName, err = getBuildpackFromInput(cli, cmd.Input)
+		buildpackGUID, buildpackName, err = getBuildpackFromInput(cli, cmd.Input, cmd.Output)
 	} else {
 		buildpackGUID, err = getBuildpackFromName(cli, buildpackName)
 	}
 
-	if err != nil {
-		lo.G.Fatal(err)
+	ui.Say("Checking which apps use buildpack %s ...\n", terminal.CommandColor(buildpackName))
+
+	var apps []appLocator
+	if err == nil {
+		apps, err = getAppsByBuildpackGUID(cli, buildpackGUID)
 	}
 
+	if err != nil {
+		ui.Failed("Error completing request: %v", err)
+		return
+	}
+
+	ui.Ok()
+
+	if len(apps) == 0 {
+		ui.Say("No apps found")
+		os.Exit(0)
+	}
+
+	table := ui.Table([]string{"org", "space", "application"})
+	for _, app := range apps {
+		table.Add(app.OrgName, app.SpaceName, app.Name)
+	}
+
+	table.Print()
+}
+
+// Start - the entry point for the CF RPC server
+func (cmd *BuildpackUsage) Start() {
+	plugin.Start(cmd)
+}
+
+func getAppsByBuildpackGUID(cli plugin.CliConnection, buildpackGUID string) (apps []appLocator, err error) {
+	apps = make([]appLocator, 0, 5)
 	orgSpaceMap := make(map[string]*orgSpaceInfo)
+
+	var json map[string]interface{}
 
 	var nextURL interface{}
 	nextURL = "/v2/apps"
 
-	table := tablewriter.NewWriter(cmd.Output)
-	table.SetHeader([]string{"App Name", "Org", "Space"})
-
 	for nextURL != nil {
-		json, err := cfcurl.Curl(cli, nextURL.(string))
+		json, err = cfcurl.Curl(cli, nextURL.(string))
 		if err != nil {
-			lo.G.Fatal(err)
+			return
 		}
 
-		apps := json["resources"].([]interface{})
-		for _, appIntf := range apps {
-			app := appIntf.(map[string]interface{})
-			appEntity := app["entity"].(map[string]interface{})
+		appsResources := toJSONArray(json["resources"])
+		for _, appIntf := range appsResources {
+			app := toJSONObject(appIntf)
+			appEntity := toJSONObject(app["entity"])
 			appName := appEntity["name"].(string)
 			appSpaceURL := appEntity["space_url"].(string)
 
@@ -107,23 +166,42 @@ func (cmd *BuildpackUsage) Run(cli plugin.CliConnection, args []string) {
 			if orgSpaceMap[appSpaceURL] == nil {
 				orgSpaceMap[appSpaceURL], err = getOrgSpaceInfo(cli, appSpaceURL)
 				if err != nil {
-					lo.G.Fatal(err)
+					return
 				}
 			}
 
 			info := orgSpaceMap[appSpaceURL]
-			table.Append([]string{appName, info.OrgName, info.SpaceName})
+
+			appInfo := appLocator{orgSpaceInfo: *info, Name: appName}
+
+			apps = append(apps, appInfo)
 		}
 
 		nextURL = json["next_url"]
 	}
 
-	table.Render()
-}
+	slice.Sort(apps, func(i, j int) bool {
+		locator1, locator2 := apps[i], apps[j]
+		if locator1.OrgName < locator2.OrgName {
+			return true
+		} else if locator1.OrgName > locator2.OrgName {
+			return false
+		}
 
-// Start - the entry point for the CF RPC server
-func (cmd *BuildpackUsage) Start() {
-	plugin.Start(cmd)
+		if locator1.SpaceName < locator2.SpaceName {
+			return true
+		} else if locator1.SpaceName > locator2.SpaceName {
+			return false
+		}
+
+		if locator1.Name <= locator2.Name {
+			return true
+		}
+
+		return false
+	})
+
+	return
 }
 
 func getBuildpackFromName(cli plugin.CliConnection, buildpackName string) (buildpackGUID string, err error) {
@@ -134,11 +212,11 @@ func getBuildpackFromName(cli plugin.CliConnection, buildpackName string) (build
 		return
 	}
 
-	resources := buildpackJSON["resources"].([]interface{})
+	resources := toJSONArray(buildpackJSON["resources"])
 	for _, resourceIntf := range resources {
-		resource := resourceIntf.(map[string]interface{})
-		guid := resource["metadata"].(map[string]interface{})["guid"].(string)
-		bpName := resource["entity"].(map[string]interface{})["name"].(string)
+		resource := toJSONObject(resourceIntf)
+		guid := toJSONObject(resource["metadata"])["guid"].(string)
+		bpName := toJSONObject(resource["entity"])["name"].(string)
 
 		if bpName == buildpackName {
 			buildpackGUID = guid
@@ -146,11 +224,12 @@ func getBuildpackFromName(cli plugin.CliConnection, buildpackName string) (build
 		}
 	}
 
+	err = fmt.Errorf("Could not find buildpack %s", terminal.CommandColor(buildpackName))
 	return
 }
 
 // Return the buildpack guid from user input
-func getBuildpackFromInput(cli plugin.CliConnection, input io.Reader) (buildpackGUID string, buildpackName string, err error) {
+func getBuildpackFromInput(cli plugin.CliConnection, input io.Reader, output io.Writer) (buildpackGUID string, buildpackName string, err error) {
 	var buildpackJSON map[string]interface{}
 	var choice int
 
@@ -162,29 +241,24 @@ func getBuildpackFromInput(cli plugin.CliConnection, input io.Reader) (buildpack
 	var buildpacks = make(map[string]string)
 	var buildpackIndexList = make([]string, 0, 8)
 
-	resources := buildpackJSON["resources"].([]interface{})
+	resources := toJSONArray(buildpackJSON["resources"])
 	for _, resourceIntf := range resources {
-		resource := resourceIntf.(map[string]interface{})
-		guid := resource["metadata"].(map[string]interface{})["guid"].(string)
-		bpName := resource["entity"].(map[string]interface{})["name"].(string)
+		resource := toJSONObject(resourceIntf)
+		guid := toJSONObject(resource["metadata"])["guid"].(string)
+		bpName := toJSONObject(resource["entity"])["name"].(string)
 		buildpacks[guid] = bpName
 		buildpackIndexList = append(buildpackIndexList, guid)
 	}
 
-	fmt.Println("Please select which buildpack whose apps you would like to see:")
+	fmt.Fprintln(output, "Please select which buildpack whose apps you would like to see:")
 	for idx, bpGUID := range buildpackIndexList {
 		fmt.Printf("%d. %s\n", idx+1, buildpacks[bpGUID])
 	}
 
-	count := 0
 	for !(choice >= 1 && choice <= len(buildpackIndexList)) {
-		fmt.Printf("Please choose: ")
+		fmt.Fprintf(output, "Please choose: ")
 		fmt.Fscanf(input, "%d", &choice)
-
-		if count = count + 1; count > 10 {
-			err = fmt.Errorf("You've tried too many times!")
-			return
-		}
+		fmt.Fprintln(output)
 	}
 
 	buildpackGUID = buildpackIndexList[choice-1]
@@ -200,7 +274,7 @@ func getOrgSpaceInfo(cli plugin.CliConnection, spaceURL string) (info *orgSpaceI
 	}
 
 	info = new(orgSpaceInfo)
-	entity := json["entity"].(map[string]interface{})
+	entity := toJSONObject(json["entity"])
 	info.SpaceName = entity["name"].(string)
 
 	json, err = cfcurl.Curl(cli, entity["organization_url"].(string))
@@ -209,8 +283,16 @@ func getOrgSpaceInfo(cli plugin.CliConnection, spaceURL string) (info *orgSpaceI
 		return
 	}
 
-	entity = json["entity"].(map[string]interface{})
+	entity = toJSONObject(json["entity"])
 	info.OrgName = entity["name"].(string)
 
 	return
+}
+
+func toJSONArray(obj interface{}) []interface{} {
+	return obj.([]interface{})
+}
+
+func toJSONObject(obj interface{}) map[string]interface{} {
+	return obj.(map[string]interface{})
 }

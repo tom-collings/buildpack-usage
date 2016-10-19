@@ -1,9 +1,11 @@
 package: github.com/ecsteam/buildpack-usage
 import:
+- package: github.com/bradfitz/slice
 - package: github.com/cloudfoundry/cli
-  version: v9001
   subpackages:
+  - cf/terminal
+  - cf/trace
   - plugin
+- package: github.com/fatih/color
 - package: github.com/krujos/cfcurl
-- package: github.com/olekukonko/tablewriter
 - package: github.com/xchapter7x/lo
