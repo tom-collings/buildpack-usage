@@ -1,0 +1,128 @@
+{
+   "total_results": 8,
+   "total_pages": 1,
+   "prev_url": null,
+   "next_url": null,
+   "resources": [
+      {
+         "metadata": {
+            "guid": "b9760c77-a2e7-4a89-96c0-7607dfb2fda9",
+            "url": "/v2/buildpacks/b9760c77-a2e7-4a89-96c0-7607dfb2fda9",
+            "created_at": "2016-09-27T20:16:14Z",
+            "updated_at": "2016-09-27T20:16:14Z"
+         },
+         "entity": {
+            "name": "staticfile_buildpack",
+            "position": 1,
+            "enabled": true,
+            "locked": false,
+            "filename": "staticfile_buildpack-cached-v1.3.9.zip"
+         }
+      },
+      {
+         "metadata": {
+            "guid": "3b49c9f0-f41a-40a4-b402-e45b9e26055a",
+            "url": "/v2/buildpacks/3b49c9f0-f41a-40a4-b402-e45b9e26055a",
+            "created_at": "2016-09-27T20:16:14Z",
+            "updated_at": "2016-09-27T20:16:16Z"
+         },
+         "entity": {
+            "name": "java_buildpack_offline",
+            "position": 2,
+            "enabled": true,
+            "locked": false,
+            "filename": "java-buildpack-offline-v3.8.1.zip"
+         }
+      },
+      {
+         "metadata": {
+            "guid": "0ff9db30-2ac9-493f-a0fa-a1fd8f9efc06",
+            "url": "/v2/buildpacks/0ff9db30-2ac9-493f-a0fa-a1fd8f9efc06",
+            "created_at": "2016-09-27T20:16:15Z",
+            "updated_at": "2016-09-27T20:16:17Z"
+         },
+         "entity": {
+            "name": "ruby_buildpack",
+            "position": 3,
+            "enabled": true,
+            "locked": false,
+            "filename": "ruby_buildpack-cached-v1.6.19.zip"
+         }
+      },
+      {
+         "metadata": {
+            "guid": "476a07d9-bb0a-46ed-b34e-55f893f95f4d",
+            "url": "/v2/buildpacks/476a07d9-bb0a-46ed-b34e-55f893f95f4d",
+            "created_at": "2016-09-27T20:16:16Z",
+            "updated_at": "2016-09-27T20:16:17Z"
+         },
+         "entity": {
+            "name": "nodejs_buildpack",
+            "position": 4,
+            "enabled": true,
+            "locked": false,
+            "filename": "nodejs_buildpack-cached-v1.5.15.zip"
+         }
+      },
+      {
+         "metadata": {
+            "guid": "9279e276-4601-44a9-b72c-1e17005c9171",
+            "url": "/v2/buildpacks/9279e276-4601-44a9-b72c-1e17005c9171",
+            "created_at": "2016-09-27T20:16:17Z",
+            "updated_at": "2016-09-27T20:16:23Z"
+         },
+         "entity": {
+            "name": "go_buildpack",
+            "position": 5,
+            "enabled": true,
+            "locked": false,
+            "filename": "go_buildpack-cached-v1.7.10.zip"
+         }
+      },
+      {
+         "metadata": {
+            "guid": "978a5405-1659-4b20-becd-a07e1108901c",
+            "url": "/v2/buildpacks/978a5405-1659-4b20-becd-a07e1108901c",
+            "created_at": "2016-09-27T20:16:17Z",
+            "updated_at": "2016-09-27T20:16:22Z"
+         },
+         "entity": {
+            "name": "python_buildpack",
+            "position": 6,
+            "enabled": true,
+            "locked": false,
+            "filename": "python_buildpack-cached-v1.5.7.zip"
+         }
+      },
+      {
+         "metadata": {
+            "guid": "4a06eb31-1b5d-4e92-a9d6-4e120b3afe36",
+            "url": "/v2/buildpacks/4a06eb31-1b5d-4e92-a9d6-4e120b3afe36",
+            "created_at": "2016-09-27T20:16:22Z",
+            "updated_at": "2016-09-27T20:16:25Z"
+         },
+         "entity": {
+            "name": "php_buildpack",
+            "position": 7,
+            "enabled": true,
+            "locked": false,
+            "filename": "php_buildpack-cached-v4.3.14.zip"
+         }
+      },
+      {
+         "metadata": {
+            "guid": "d93f2254-d8e5-4d4a-a39d-d253e8b7355e",
+            "url": "/v2/buildpacks/d93f2254-d8e5-4d4a-a39d-d253e8b7355e",
+            "created_at": "2016-09-27T20:16:23Z",
+            "updated_at": "2016-09-27T20:16:23Z"
+         },
+         "entity": {
+            "name": "binary_buildpack",
+            "position": 8,
+            "enabled": true,
+            "locked": false,
+            "filename": "binary_buildpack-cached-v1.0.2.zip"
+         }
+      }
+   ]
+}
