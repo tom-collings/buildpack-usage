@@ -1,6 +1,9 @@
 package: github.com/ecsteam/buildpack-usage
 import:
 - package: github.com/cloudfoundry/cli
+  version: v9001
   subpackages:
   - plugin
 - package: github.com/krujos/cfcurl
+- package: github.com/olekukonko/tablewriter
+- package: github.com/xchapter7x/lo
