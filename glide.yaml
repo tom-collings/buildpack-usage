@@ -3,9 +3,9 @@ import:
 - package: github.com/bradfitz/slice
 - package: github.com/cloudfoundry/cli
   subpackages:
+  - cf/i18n
   - cf/terminal
   - cf/trace
   - plugin
 - package: github.com/fatih/color
 - package: github.com/krujos/cfcurl
-- package: github.com/xchapter7x/lo
