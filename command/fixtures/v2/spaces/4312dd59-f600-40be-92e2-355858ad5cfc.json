@@ -1,0 +1,25 @@
+{
+   "metadata": {
+      "guid": "4312dd59-f600-40be-92e2-355858ad5cfc",
+      "url": "/v2/spaces/4312dd59-f600-40be-92e2-355858ad5cfc",
+      "created_at": "2016-10-18T18:02:53Z",
+      "updated_at": null
+   },
+   "entity": {
+      "name": "gcp-service-broker-space",
+      "organization_guid": "ff16dea3-a7ef-42fd-bef6-1d5ef13f39c2",
+      "space_quota_definition_guid": null,
+      "allow_ssh": true,
+      "organization_url": "/v2/organizations/ff16dea3-a7ef-42fd-bef6-1d5ef13f39c2",
+      "developers_url": "/v2/spaces/4312dd59-f600-40be-92e2-355858ad5cfc/developers",
+      "managers_url": "/v2/spaces/4312dd59-f600-40be-92e2-355858ad5cfc/managers",
+      "auditors_url": "/v2/spaces/4312dd59-f600-40be-92e2-355858ad5cfc/auditors",
+      "apps_url": "/v2/spaces/4312dd59-f600-40be-92e2-355858ad5cfc/apps",
+      "routes_url": "/v2/spaces/4312dd59-f600-40be-92e2-355858ad5cfc/routes",
+      "domains_url": "/v2/spaces/4312dd59-f600-40be-92e2-355858ad5cfc/domains",
+      "service_instances_url": "/v2/spaces/4312dd59-f600-40be-92e2-355858ad5cfc/service_instances",
+      "app_events_url": "/v2/spaces/4312dd59-f600-40be-92e2-355858ad5cfc/app_events",
+      "events_url": "/v2/spaces/4312dd59-f600-40be-92e2-355858ad5cfc/events",
+      "security_groups_url": "/v2/spaces/4312dd59-f600-40be-92e2-355858ad5cfc/security_groups"
+   }
+}

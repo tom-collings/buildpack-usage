@@ -1,0 +1,25 @@
+{
+   "metadata": {
+      "guid": "58cad13a-9316-42e0-9e00-d0886ce006da",
+      "url": "/v2/spaces/58cad13a-9316-42e0-9e00-d0886ce006da",
+      "created_at": "2016-09-29T20:47:03Z",
+      "updated_at": null
+   },
+   "entity": {
+      "name": "redis-smoke-test-space",
+      "organization_guid": "9e7e2b6d-61fc-48b7-8b6c-e66a7563dd36",
+      "space_quota_definition_guid": null,
+      "allow_ssh": true,
+      "organization_url": "/v2/organizations/9e7e2b6d-61fc-48b7-8b6c-e66a7563dd36",
+      "developers_url": "/v2/spaces/58cad13a-9316-42e0-9e00-d0886ce006da/developers",
+      "managers_url": "/v2/spaces/58cad13a-9316-42e0-9e00-d0886ce006da/managers",
+      "auditors_url": "/v2/spaces/58cad13a-9316-42e0-9e00-d0886ce006da/auditors",
+      "apps_url": "/v2/spaces/58cad13a-9316-42e0-9e00-d0886ce006da/apps",
+      "routes_url": "/v2/spaces/58cad13a-9316-42e0-9e00-d0886ce006da/routes",
+      "domains_url": "/v2/spaces/58cad13a-9316-42e0-9e00-d0886ce006da/domains",
+      "service_instances_url": "/v2/spaces/58cad13a-9316-42e0-9e00-d0886ce006da/service_instances",
+      "app_events_url": "/v2/spaces/58cad13a-9316-42e0-9e00-d0886ce006da/app_events",
+      "events_url": "/v2/spaces/58cad13a-9316-42e0-9e00-d0886ce006da/events",
+      "security_groups_url": "/v2/spaces/58cad13a-9316-42e0-9e00-d0886ce006da/security_groups"
+   }
+}

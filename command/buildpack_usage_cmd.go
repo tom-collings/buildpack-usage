@@ -3,8 +3,8 @@ package command
 import (
 	"flag"
 	"fmt"
-	"io"
 	"os"
+	"strconv"
 
 	"github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -27,8 +27,7 @@ type appLocator struct {
 
 // BuildpackUsage - the main struct to implement the plugin struct
 type BuildpackUsage struct {
-	Input  io.Reader
-	Output io.Writer
+	UI terminal.UI
 }
 
 // New - returns a new instance of the command
@@ -41,9 +40,20 @@ func New() *BuildpackUsage {
 		return fmt.Sprintf(translationID+"\n", args...)
 	}
 
+	ui := terminal.NewUI(
+		os.Stdin,
+		Writer,
+		terminal.NewTeePrinter(Writer),
+		trace.NewLogger(Writer, false, "false", ""),
+	)
+
+	return NewCommand(ui)
+}
+
+// NewCommand - Returns a new instance of the command suitable for testing
+func NewCommand(ui terminal.UI) *BuildpackUsage {
 	return &BuildpackUsage{
-		Input:  os.Stdin,
-		Output: os.Stdout,
+		UI: ui,
 	}
 }
 
@@ -73,7 +83,7 @@ func (cmd *BuildpackUsage) Run(cli plugin.CliConnection, args []string) {
 	defer func() {
 		// recover from panic if one occured. Set err to nil otherwise.
 		if recover() != nil {
-			os.Exit(1)
+			os.Exit(255)
 		}
 	}()
 
@@ -82,7 +92,7 @@ func (cmd *BuildpackUsage) Run(cli plugin.CliConnection, args []string) {
 	var err error
 
 	if args[0] != cmd.GetMetadata().Commands[0].Name {
-		return
+		os.Exit(2)
 	}
 
 	flagSet := flag.NewFlagSet("command-args", flag.ContinueOnError)
@@ -90,20 +100,13 @@ func (cmd *BuildpackUsage) Run(cli plugin.CliConnection, args []string) {
 	flagSet.StringVar(&buildpackName, "b", "NOT_SET", "The requested buildpack")
 	flagSet.Parse(args[1:])
 
-	ui := terminal.NewUI(
-		os.Stdin,
-		Writer,
-		terminal.NewTeePrinter(Writer),
-		trace.NewLogger(Writer, false, "false", ""),
-	)
-
 	if buildpackName == "NOT_SET" {
-		buildpackGUID, buildpackName, err = getBuildpackFromInput(cli, cmd.Input, cmd.Output)
+		buildpackGUID, buildpackName, err = getBuildpackFromInput(cli, cmd.UI)
 	} else {
 		buildpackGUID, err = getBuildpackFromName(cli, buildpackName)
 	}
 
-	ui.Say("Checking which apps use buildpack %s ...\n", terminal.CommandColor(buildpackName))
+	cmd.UI.Say("Checking which apps use buildpack %s ...\n", terminal.CommandColor(buildpackName))
 
 	var apps []appLocator
 	if err == nil {
@@ -111,23 +114,25 @@ func (cmd *BuildpackUsage) Run(cli plugin.CliConnection, args []string) {
 	}
 
 	if err != nil {
-		ui.Failed("Error completing request: %v", err)
-		return
+		cmd.UI.Failed("Error completing request: %v", err)
+		os.Exit(1)
 	}
 
-	ui.Ok()
+	cmd.UI.Ok()
+	cmd.UI.Say("")
 
 	if len(apps) == 0 {
-		ui.Say("No apps found")
+		cmd.UI.Say("No apps found")
 		os.Exit(0)
 	}
 
-	table := ui.Table([]string{"org", "space", "application"})
+	table := cmd.UI.Table([]string{"org", "space", "application"})
 	for _, app := range apps {
 		table.Add(app.OrgName, app.SpaceName, app.Name)
 	}
 
 	table.Print()
+	os.Exit(0)
 }
 
 // Start - the entry point for the CF RPC server
@@ -229,7 +234,7 @@ func getBuildpackFromName(cli plugin.CliConnection, buildpackName string) (build
 }
 
 // Return the buildpack guid from user input
-func getBuildpackFromInput(cli plugin.CliConnection, input io.Reader, output io.Writer) (buildpackGUID string, buildpackName string, err error) {
+func getBuildpackFromInput(cli plugin.CliConnection, ui terminal.UI) (buildpackGUID string, buildpackName string, err error) {
 	var buildpackJSON map[string]interface{}
 	var choice int
 
@@ -250,15 +255,20 @@ func getBuildpackFromInput(cli plugin.CliConnection, input io.Reader, output io.
 		buildpackIndexList = append(buildpackIndexList, guid)
 	}
 
-	fmt.Fprintln(output, "Please select which buildpack whose apps you would like to see:")
+	ui.Say("Please select which buildpack whose apps you would like to see:")
 	for idx, bpGUID := range buildpackIndexList {
-		fmt.Printf("%d. %s\n", idx+1, buildpacks[bpGUID])
+		ui.Say("%d. %s", idx+1, buildpacks[bpGUID])
 	}
 
 	for !(choice >= 1 && choice <= len(buildpackIndexList)) {
-		fmt.Fprintf(output, "Please choose: ")
-		fmt.Fscanf(input, "%d", &choice)
-		fmt.Fprintln(output)
+		choiceStr := ui.Ask("Please choose: ")
+
+		var convErr error
+		if choice, convErr = strconv.Atoi(choiceStr); convErr != nil {
+			continue
+		}
+
+		ui.Say("")
 	}
 
 	buildpackGUID = buildpackIndexList[choice-1]
