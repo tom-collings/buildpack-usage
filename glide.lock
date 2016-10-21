@@ -1,8 +1,8 @@
-hash: 4e6bff34eca31c8e47bf9569053aaa9d18efe30dbeb486decad861f9c48b10bf
-updated: 2016-10-19T17:32:18.469241697-04:00
+hash: af395e4ac96d8c56dd425323f4203666503723ac980ac756c10fb865884d0870
+updated: 2016-10-21T14:32:25.394637535-06:00
 imports:
 - name: code.cloudfoundry.org/cli
-  version: b80ba275e857966234e6c3b5c20f7255744b0e3b
+  version: 9494eef0c685481d61e79b6ba9bf26b6dfd69eac
   subpackages:
   - cf
   - cf/configuration
@@ -12,6 +12,7 @@ imports:
   - cf/models
   - cf/resources
   - cf/trace
+  - plugin
   - plugin/models
 - name: github.com/blang/semver
   version: 60ec3488bfea7cca02b021d106d9911120d25fe9
@@ -19,12 +20,13 @@ imports:
 - name: github.com/bradfitz/slice
   version: d9036e2120b5ddfa53f3ebccd618c4af275f47da
 - name: github.com/cloudfoundry/cli
-  version: b80ba275e857966234e6c3b5c20f7255744b0e3b
+  version: 9494eef0c685481d61e79b6ba9bf26b6dfd69eac
   subpackages:
   - cf/i18n
   - cf/terminal
   - cf/trace
   - plugin
+  - plugin/pluginfakes
 - name: github.com/fatih/color
   version: 533cd7fd8a85905f67a1753afb4deddc85ea174f
 - name: github.com/krujos/cfcurl
@@ -43,6 +45,37 @@ imports:
   - i18n/bundle
   - i18n/language
   - i18n/translation
+- name: github.com/onsi/ginkgo
+  version: 7d3240191d7b2311b60090fcbc96e56bffc45ec0
+  subpackages:
+  - config
+  - internal/codelocation
+  - internal/containernode
+  - internal/failer
+  - internal/leafnodes
+  - internal/remote
+  - internal/spec
+  - internal/specrunner
+  - internal/suite
+  - internal/testingtproxy
+  - internal/writer
+  - reporters
+  - reporters/stenographer
+  - types
+- name: github.com/onsi/gomega
+  version: 9ed8da19f2156b87a803a8fdf6d126f627a12db1
+  subpackages:
+  - format
+  - internal/assertion
+  - internal/asyncassertion
+  - internal/oraclematcher
+  - internal/testingtsupport
+  - matchers
+  - matchers/support/goraph/bipartitegraph
+  - matchers/support/goraph/edge
+  - matchers/support/goraph/node
+  - matchers/support/goraph/util
+  - types
 - name: go4.org
   version: 399a9d7bfe85437346a5ec4ef0450fc2f1084e61
   subpackages:
