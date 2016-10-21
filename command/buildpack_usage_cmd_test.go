@@ -189,7 +189,7 @@ var _ = Describe("Buildpack-Usage", func() {
 		var cmd *BuildpackUsage
 		BeforeEach(func() {
 			output = new(bytes.Buffer)
-			input = bytes.NewBufferString("2")
+			input = bytes.NewBufferString("2\n")
 
 			ui := &testUI{
 				Input:  input,
@@ -204,8 +204,9 @@ var _ = Describe("Buildpack-Usage", func() {
 
 			lines := convertCommandOutputToStringSlice(cmd)
 
-			Ω(lines[2]).To(Equal("OK"))
-			Ω(len(lines[5:])).To(Equal(6))
+			Ω(lines[0]).To(Equal("Please select which buildpack whose apps you would like to see:"))
+			Ω(lines[13]).To(Equal("OK"))
+			Ω(len(lines[16:])).To(Equal(6))
 		})
 	})
 })

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/cloudfoundry/cli/cf/i18n"
 	"github.com/cloudfoundry/cli/cf/terminal"
@@ -24,6 +25,8 @@ type appLocator struct {
 	orgSpaceInfo
 	Name string
 }
+
+var version = "0.0.1"
 
 // BuildpackUsage - the main struct to implement the plugin struct
 type BuildpackUsage struct {
@@ -59,12 +62,24 @@ func NewCommand(ui terminal.UI) *BuildpackUsage {
 
 // GetMetadata - return info about the plugin
 func (cmd *BuildpackUsage) GetMetadata() plugin.PluginMetadata {
+	var semver = strings.Split(version, ".")
+
+	var verParts = make([]int, 0, 3)
+	for _, part := range semver {
+		vPart, err := strconv.Atoi(part)
+		if err != nil {
+			panic(err)
+		}
+
+		verParts = append(verParts, vPart)
+	}
+
 	return plugin.PluginMetadata{
 		Name: "buildpack-usage",
 		Version: plugin.VersionType{
-			Major: 0,
-			Minor: 9,
-			Build: 9,
+			Major: verParts[0],
+			Minor: verParts[1],
+			Build: verParts[2],
 		},
 		Commands: []plugin.Command{
 			{
@@ -83,7 +98,6 @@ func (cmd *BuildpackUsage) Run(cli plugin.CliConnection, args []string) {
 	defer func() {
 		// recover from panic if one occured. Set err to nil otherwise.
 		if recover() != nil {
-			os.Exit(255)
 		}
 	}()
 
@@ -92,7 +106,7 @@ func (cmd *BuildpackUsage) Run(cli plugin.CliConnection, args []string) {
 	var err error
 
 	if args[0] != cmd.GetMetadata().Commands[0].Name {
-		os.Exit(2)
+		return
 	}
 
 	flagSet := flag.NewFlagSet("command-args", flag.ContinueOnError)
@@ -115,7 +129,7 @@ func (cmd *BuildpackUsage) Run(cli plugin.CliConnection, args []string) {
 
 	if err != nil {
 		cmd.UI.Failed("Error completing request: %v", err)
-		os.Exit(1)
+		return
 	}
 
 	cmd.UI.Ok()
@@ -123,7 +137,7 @@ func (cmd *BuildpackUsage) Run(cli plugin.CliConnection, args []string) {
 
 	if len(apps) == 0 {
 		cmd.UI.Say("No apps found")
-		os.Exit(0)
+		return
 	}
 
 	table := cmd.UI.Table([]string{"org", "space", "application"})
@@ -132,7 +146,7 @@ func (cmd *BuildpackUsage) Run(cli plugin.CliConnection, args []string) {
 	}
 
 	table.Print()
-	os.Exit(0)
+	return
 }
 
 // Start - the entry point for the CF RPC server
@@ -261,7 +275,8 @@ func getBuildpackFromInput(cli plugin.CliConnection, ui terminal.UI) (buildpackG
 	}
 
 	for !(choice >= 1 && choice <= len(buildpackIndexList)) {
-		choiceStr := ui.Ask("Please choose: ")
+		var choiceStr string
+		choiceStr = ui.Ask("Please choose: ")
 
 		var convErr error
 		if choice, convErr = strconv.Atoi(choiceStr); convErr != nil {
