@@ -16,7 +16,7 @@ go get -u github.com/Masterminds/glide/...
 
 # Vendor dependencies
 cd ${basedir}
-glide install
+$GOPATH/bin/glide install
 
 # Run tests
 go test ./...
