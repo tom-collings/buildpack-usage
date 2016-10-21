@@ -8,7 +8,7 @@ inputs:
   path: gopath/src/github.com/ecsteam/buildpack-usage
 
 outputs:
-- name: gopath/src/github.com/ecsteam/buildpack-usage
+- name: gopath-tested
 
 run:
   path: gopath/src/github.com/ecsteam/buildpack-usage/ci/tasks/do-test.sh

@@ -1,5 +1,8 @@
 #!/bin/sh
 basedir=`pwd`/gopath/src/github.com/ecsteam/buildpack-usage
+outdir=`pwd`/gopath-tested
+
+mkdir -p ${outdir} > /dev/null 2>&1
 
 set -e
 set -x
@@ -15,3 +18,5 @@ glide install
 
 # Run tests
 go test ./...
+
+cp -Rvf `pwd`/gopath ${outdir}/

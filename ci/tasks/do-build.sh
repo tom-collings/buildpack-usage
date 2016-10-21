@@ -1,5 +1,5 @@
 #!/bin/sh
-basedir=`pwd`/gopath/src/github.com/ecsteam/buildpack-usage
+basedir=`pwd`/gopath-tested/src/github.com/ecsteam/buildpack-usage
 build_dir=`pwd`/build-output/build
 version_file=`pwd`/version/number
 
@@ -8,7 +8,7 @@ mkdir ${build_dir} > /dev/null
 set -e
 set -x
 
-export GOPATH=`pwd`/gopath
+export GOPATH=`pwd`/gopath-tested
 
 # Run tests
 cd ${basedir}
