@@ -9,6 +9,8 @@ set -x
 
 export GOPATH=`pwd`/gopath
 
+apk update && apk upgrade && apk add git
+
 # Install Glide
 go get -u github.com/Masterminds/glide/...
 
