@@ -29,9 +29,9 @@ jobs:
   - get: version
     params: { bump: patch }
   - task: test
-    file: ci/tasks/do-test.yml
+    file: source/ci/tasks/do-test.yml
   - task: build
-    file: ci/tasks/do-build.yml
+    file: source/ci/tasks/do-build.yml
   - put: release
     params:
       name: version/number
