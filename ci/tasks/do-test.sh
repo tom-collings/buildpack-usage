@@ -20,5 +20,6 @@ $GOPATH/bin/glide install
 
 # Run tests
 go test `$GOPATH/bin/glide novendor`
+cd -
 
 cp -Rvf `pwd`/gopath ${outdir}/
