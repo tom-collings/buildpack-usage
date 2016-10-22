@@ -3,7 +3,7 @@ basedir=`pwd`/gopath-tested/src/github.com/ecsteam/buildpack-usage
 build_dir=`pwd`/build-output/build
 version_file=`pwd`/version/number
 
-mkdir ${build_dir} > /dev/null
+mkdir ${build_dir} > /dev/null 2>&1
 
 set -e
 set -x
@@ -12,7 +12,7 @@ export GOPATH=`pwd`/gopath-tested
 
 # Run tests
 cd ${basedir}
-for os in "linux windows darwin"; do
+for os in linux windows darwin; do
     suffix=${os}
     if [ "windows" = "${os}" ]; then
         suffix="windows.exe"

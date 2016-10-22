@@ -22,4 +22,4 @@ $GOPATH/bin/glide install
 go test `$GOPATH/bin/glide novendor`
 cd -
 
-cp -Rvf `pwd`/gopath/* ${outdir}/
+cp -Rvf `pwd`/gopath/{src,bin,pkg,go} ${outdir}/
