@@ -11,4 +11,4 @@ outputs:
 - name: build-output/build
 
 run:
-  path: gopath/src/github.com/ecsteam/buildpack-usage/ci/tasks/do-build.sh
+  path: gopath-tested/src/github.com/ecsteam/buildpack-usage/ci/tasks/do-build.sh
