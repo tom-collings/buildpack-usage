@@ -19,10 +19,10 @@ cd ${basedir}
 $GOPATH/bin/glide install
 
 # Run tests
-go test `$GOPATH/bin/glide novendor`
+$GOPATH/bin/ginkgo command
+#go test `$GOPATH/bin/glide novendor`
 cd -
 
 cp -Rvf `pwd`/gopath/src ${outdir}/
 cp -Rvf `pwd`/gopath/bin ${outdir}/
 cp -Rvf `pwd`/gopath/pkg ${outdir}/
-cp -Rvf `pwd`/gopath/go ${outdir}/
