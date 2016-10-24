@@ -132,8 +132,7 @@ func (cmd *BuildpackUsage) Run(cli plugin.CliConnection, args []string) {
 		return
 	}
 
-	cmd.UI.Ok()
-	cmd.UI.Say("")
+	cmd.UI.Say("OK\n")
 
 	if len(apps) == 0 {
 		cmd.UI.Say("No apps found")
