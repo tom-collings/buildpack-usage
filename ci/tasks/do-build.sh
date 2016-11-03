@@ -20,5 +20,5 @@ for os in linux windows darwin; do
         suffix="macosx"
     fi
 
-    GOOS=${os} GOARCH=amd64 go build -ldflags="-X github.com/ecsteam/buildpack-usage/command.version=`cat ${version_file}`" -o ${build_dir}/buildpack-usage-${suffix}
+    GOOS=${os} GOARCH=amd64 CGO_ENABLED=0 go build -ldflags="-X github.com/ecsteam/buildpack-usage/command.version=`cat ${version_file}`" -o ${build_dir}/buildpack-usage-${suffix}
 done
