@@ -12,7 +12,7 @@ import (
 	"github.com/cloudfoundry/cli/cf/terminal"
 
 	. "github.com/cloudfoundry/cli/cf/i18n"
-	. "github.com/ecsteam/buildpack-usage/command"
+	. "github.com/tom-collings/buildpack-usage/command"
 
 	"github.com/cloudfoundry/cli/plugin/pluginfakes"
 
